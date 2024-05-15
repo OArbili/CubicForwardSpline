@@ -1,0 +1,8 @@
+2024-05-15 21:31:02,683 - INFO - Initializing CubicForwardSpline
+2024-05-15 21:31:02,684 - INFO - Finished initializing CubicForwardSpline
+2024-05-15 21:31:04,232 - INFO - Starting load_data
+2024-05-15 21:31:04,249 - ERROR - Exception occurred in load_data
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 225, in load_data
+    self.adj_params['b0'] = self.generate_long_tail(0, 5, scale=1, size=len(self.params.index))
+TypeError: CubicForwardSpline.generate_long_tail() got multiple values for argument 'scale'

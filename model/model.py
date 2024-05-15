@@ -49,8 +49,12 @@ class CubicForwardSpline:
             self.cf = in_cf
             self.params = in_params
             if in_params is not None:
-                self.adj_params = in_params[['b0', 'b1', 'b2', 'b3']].copy()
-                self.adj_params_flatten = self.adj_params.values.flatten()
+                self.params = in_params[['b0', 'b1', 'b2', 'b3']].copy()
+                self.params['b0'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                self.params['b1'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                self.params['b2'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                self.params['b3'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                self.params_flatten = self.adj_params.values.flatten()
 
             if in_cf is not None:
                 self.cf['pdate'] = pd.to_datetime(self.cf['pdate'], dayfirst=True)
@@ -61,6 +65,15 @@ class CubicForwardSpline:
         except Exception as e:
             logger.exception("Exception occurred while initializing CubicForwardSpline")
             raise e
+
+    # Function to generate numbers with a long tail distribution
+    def generate_long_tail(self, low, high, scale, size=1):
+        data = np.random.exponential(scale=scale, size=size)
+        # Scale to the desired range
+        data = data / data.max() * (high - low)
+        # Truncate values
+        data = np.where(data > high, high, data)
+        return data
 
     def calc_spline(self, in_adj_params_flatten):
         """
@@ -89,11 +102,12 @@ class CubicForwardSpline:
 
             # Update params
             self.params['f1'] = self.params['b0'] + self.params['b1'] * self.params['t1'] + self.params['b2'] * self.params['t1'] * self.params['t1'] + \
-                                self.params['b2'] * self.params['t1'] * self.params['t1'] * self.params['t1']
+                                self.params['b3'] * self.params['t1'] * self.params['t1'] * self.params['t1']
             self.params['f2'] = self.params['b0'] + self.params['b1'] * self.params['t2'] + self.params['b2'] * self.params['t2'] * self.params['t2'] + \
-                                self.params['b2'] * self.params['t2'] * self.params['t2'] * self.params['t2']
+                                self.params['b3'] * self.params['t2'] * self.params['t2'] * self.params['t2']
 
-            self.params['f1'] = self.params['f2'].shift(1)
+            self.params['old_f1'] = self.params['f1']
+            self.params['f1'] = self.params['f2'].shift(1).fillna(self.params['old_f1'])
 
             self.params['int1'] = self.params['b0'] * self.params['t1'] + \
                                   self.params['b1'] * self.params['t1'] * self.params['t1'] * 0.5 + \
@@ -108,7 +122,7 @@ class CubicForwardSpline:
             self.params['space'] = self.params['int2'] - self.params['int1']
             self.params['acc_space'] = self.params['space'].shift(1).cumsum().fillna(0)
             self.params['f_tag'] = self.params['b1'] + 2 * self.params['b2'] * self.params['t1'] + 3 * self.params['b3'] * self.params['t1'] * self.params['t1'].fillna(0)
-            self.params['f_tag_square'] = (self.params['f_tag'] - self.params['f_tag'].shift(1)).fillna(0)
+            self.params['f_tag_square'] = np.power((self.params['f_tag'] - self.params['f_tag'].shift(1)).fillna(0),2)
             self.params['wgt_tag'] = self.params['f_tag_square'] * self.params['wgt']
             params_cols_to_keep = ['t1', 't2', 'b0', 'b1', 'b2', 'b3', 'acc_space']
             
@@ -131,7 +145,10 @@ class CubicForwardSpline:
             cf_new['space'] = cf_new['int2'] - cf_new['int1']
             cf_new['r'] = (cf_new['acc_space'] + cf_new['space']) / cf_new['mat']
             cf_new['pv'] = cf_new['pmt'] / np.power((1 + cf_new['r']), cf_new['mat'])
+            self.cf_new = cf_new
+
             calc_prices = cf_new.groupby('ncode')['pv'].sum()
+            self.calc_prices = calc_prices
             error_calc_df = self.prices.merge(calc_prices, on='ncode')
             ret = np.abs(error_calc_df['price'] - error_calc_df['pv']).sum()
             logger.info("Finished calc_spline")
@@ -167,8 +184,10 @@ class CubicForwardSpline:
         logger.info("Starting run_linear")
         try:
             self.run_cubic = False
-            ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, method='L-BFGS-B', options={'ftol': 1e-02, 'maxiter': 1000})
+            ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, method='L-BFGS-B', options={'ftol': 1e-04, 'maxiter': 1000000})
             logger.info("Finished run_linear")
+            self.adj_params = self.params[['b0', 'b1', 'b2', 'b3']].copy()
+            self.adj_params_flatten = self.adj_params.values.flatten()
             return ret
         except Exception as e:
             logger.exception("Exception occurred in run_linear")
@@ -205,12 +224,21 @@ class CubicForwardSpline:
             self.prices = pd.read_csv(in_prices)
             self.cf = pd.read_csv(in_cf)
             self.params = pd.read_csv(in_params)
+            if self.params is not None:
+                self.params['t1'] = self.params['tenor']
+                self.params['t2'] = self.params['t1'].shift(-1).fillna(99)
+                self.params['b0'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
+                self.params['b1'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
+                self.params['b2'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
+                self.params['b3'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
             self.adj_params = self.params[['b0', 'b1', 'b2', 'b3']].copy()
+            
             self.adj_params_flatten = self.adj_params.values.flatten()
 
             if self.cf is not None:
                 self.cf['pdate'] = pd.to_datetime(self.cf['pdate'], dayfirst=True)
                 self.cf['tdate'] = pd.to_datetime(self.cf['tdate'], dayfirst=True)
+            
             logger.info("Finished load_data")
         except Exception as e:
             logger.exception("Exception occurred in load_data")

@@ -3342,3 +3342,103 @@
 2024-05-13 15:42:51,981 - INFO - Starting calc_spline
 2024-05-13 15:42:52,008 - INFO - Finished calc_spline
 2024-05-13 15:42:52,008 - INFO - Finished run_cubic_spline
+2024-05-15 21:10:12,409 - INFO - Initializing CubicForwardSpline
+2024-05-15 21:10:12,411 - INFO - Finished initializing CubicForwardSpline
+2024-05-15 21:10:13,500 - INFO - Starting load_data
+2024-05-15 21:10:13,518 - INFO - Finished load_data
+2024-05-15 21:10:16,248 - INFO - Starting run_one_time
+2024-05-15 21:10:16,248 - INFO - Starting calc_spline
+2024-05-15 21:10:16,250 - ERROR - Exception occurred in calc_spline
+Traceback (most recent call last):
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 't1'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 91, in calc_spline
+    self.params['f1'] = self.params['b0'] + self.params['b1'] * self.params['t1'] + self.params['b2'] * self.params['t1'] * self.params['t1'] + \
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/frame.py", line 4090, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 't1'
+2024-05-15 21:10:16,252 - ERROR - Exception occurred in run_one_time
+Traceback (most recent call last):
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 't1'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 153, in run_one_time
+    result = self.calc_spline(self.adj_params_flatten)
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 141, in calc_spline
+    raise e
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 91, in calc_spline
+    self.params['f1'] = self.params['b0'] + self.params['b1'] * self.params['t1'] + self.params['b2'] * self.params['t1'] * self.params['t1'] + \
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/frame.py", line 4090, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 't1'
+2024-05-15 21:12:09,610 - INFO - Initializing CubicForwardSpline
+2024-05-15 21:12:09,610 - INFO - Finished initializing CubicForwardSpline
+2024-05-15 21:12:11,213 - INFO - Starting load_data
+2024-05-15 21:12:11,223 - INFO - Finished load_data
+2024-05-15 21:12:13,550 - INFO - Starting run_one_time
+2024-05-15 21:12:13,551 - INFO - Starting calc_spline
+2024-05-15 21:12:13,552 - ERROR - Exception occurred in calc_spline
+Traceback (most recent call last):
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 't1'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 91, in calc_spline
+    self.params['f1'] = self.params['b0'] + self.params['b1'] * self.params['t1'] + self.params['b2'] * self.params['t1'] * self.params['t1'] + \
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/frame.py", line 4090, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 't1'
+2024-05-15 21:12:13,553 - ERROR - Exception occurred in run_one_time
+Traceback (most recent call last):
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 't1'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 153, in run_one_time
+    result = self.calc_spline(self.adj_params_flatten)
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 141, in calc_spline
+    raise e
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 91, in calc_spline
+    self.params['f1'] = self.params['b0'] + self.params['b1'] * self.params['t1'] + self.params['b2'] * self.params['t1'] * self.params['t1'] + \
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/frame.py", line 4090, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Users/arbili/opt/anaconda3/envs/bgu/lib/python3.10/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 't1'

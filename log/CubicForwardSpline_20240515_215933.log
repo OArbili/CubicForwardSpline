@@ -1,0 +1,12 @@
+2024-05-15 21:59:34,495 - INFO - Initializing CubicForwardSpline
+2024-05-15 21:59:34,495 - INFO - Finished initializing CubicForwardSpline
+2024-05-15 21:59:35,818 - INFO - Starting load_data
+2024-05-15 21:59:35,842 - INFO - Finished load_data
+2024-05-15 21:59:41,017 - INFO - Starting run_one_time
+2024-05-15 21:59:41,017 - INFO - Starting calc_spline
+2024-05-15 21:59:41,059 - INFO - Finished calc_spline
+2024-05-15 21:59:41,059 - INFO - Finished run_one_time
+2024-05-15 22:16:03,025 - INFO - Starting run_one_time
+2024-05-15 22:16:03,026 - INFO - Starting calc_spline
+2024-05-15 22:16:03,057 - INFO - Finished calc_spline
+2024-05-15 22:16:03,057 - INFO - Finished run_one_time
