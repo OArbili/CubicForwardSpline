@@ -1,0 +1,18 @@
+2024-05-24 18:54:42,355 - INFO - Initializing CubicForwardSpline
+2024-05-24 18:54:42,356 - INFO - Finished initializing CubicForwardSpline
+2024-05-24 18:54:43,159 - INFO - Starting load_data
+2024-05-24 18:54:43,180 - INFO - Finished load_data
+2024-05-24 18:54:46,565 - INFO - Starting run_one_time
+2024-05-24 18:54:46,565 - INFO - Starting calc_spline
+2024-05-24 18:54:46,612 - INFO - Finished calc_spline
+2024-05-24 18:54:46,612 - INFO - Finished run_one_time
+2024-05-24 18:54:47,870 - INFO - Starting run_linear
+2024-05-24 18:54:47,872 - ERROR - Exception occurred in run_linear
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 201, in run_linear
+    ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten,
+  File "/Users/arbili/opt/anaconda3/envs/whisperx/lib/python3.10/site-packages/scipy/optimize/_minimize.py", line 707, in minimize
+    res = _minimize_newtoncg(fun, x0, args, jac, hess, hessp, callback,
+  File "/Users/arbili/opt/anaconda3/envs/whisperx/lib/python3.10/site-packages/scipy/optimize/_optimize.py", line 1999, in _minimize_newtoncg
+    raise ValueError('Jacobian is required for Newton-CG method')
+ValueError: Jacobian is required for Newton-CG method

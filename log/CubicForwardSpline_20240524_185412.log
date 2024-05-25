@@ -1,0 +1,16 @@
+2024-05-24 18:54:13,323 - INFO - Initializing CubicForwardSpline
+2024-05-24 18:54:13,323 - INFO - Finished initializing CubicForwardSpline
+2024-05-24 18:54:14,742 - INFO - Starting load_data
+2024-05-24 18:54:14,763 - INFO - Finished load_data
+2024-05-24 18:54:17,849 - INFO - Starting run_one_time
+2024-05-24 18:54:17,850 - INFO - Starting calc_spline
+2024-05-24 18:54:17,895 - INFO - Finished calc_spline
+2024-05-24 18:54:17,895 - INFO - Finished run_one_time
+2024-05-24 18:54:18,828 - INFO - Starting run_linear
+2024-05-24 18:54:18,829 - ERROR - Exception occurred in run_linear
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 201, in run_linear
+    ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten,
+  File "/Users/arbili/opt/anaconda3/envs/whisperx/lib/python3.10/site-packages/scipy/optimize/_minimize.py", line 738, in minimize
+    raise ValueError('Unknown solver %s' % method)
+ValueError: Unknown solver Newton-CG’

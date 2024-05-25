@@ -11,6 +11,7 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 logger = logging.getLogger('CubicForwardSpline')
 
 class CubicForwardSpline:
+
     """
     A class for calculating cubic forward spline interpolation.
 
@@ -33,7 +34,6 @@ class CubicForwardSpline:
         run_cubic_spline(): Runs the cubic spline optimization.
         load_data(in_prices, in_cf, in_params): Loads data from files.
     """
-
     def __init__(self, in_prices=None, in_cf=None, in_params=None):
         """
         Initializes the CubicForwardSpline class.
@@ -50,10 +50,10 @@ class CubicForwardSpline:
             self.params = in_params
             if in_params is not None:
                 self.params = in_params[['b0', 'b1', 'b2', 'b3']].copy()
-                self.params['b0'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
-                self.params['b1'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
-                self.params['b2'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
-                self.params['b3'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                #self.params['b0'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                #self.params['b1'] = self.generate_long_tail(0, 0.2, scale=1, size=len(self.params.index))
+                #self.params['b2'] = self.generate_long_tail(-0.2, 0.2, scale=1, size=len(self.params.index))
+                #self.params['b3'] = self.generate_long_tail(-0.2, 0.2, scale=1, size=len(self.params.index))
                 self.params_flatten = self.adj_params.values.flatten()
 
             if in_cf is not None:
@@ -74,6 +74,15 @@ class CubicForwardSpline:
         # Truncate values
         data = np.where(data > high, high, data)
         return data
+
+    def constraint1(self, x):
+        f1 = x['b0'] + x['b1'] * x['t1'] + x['b2'] * x['t1'] * x['t1'] + \
+                            x['b3'] * x['t1'] * x['t1'] * x['t1']
+        f2 = x['b0'] + x['b1'] * x['t2'] + x['b2'] * x['t2'] * x['t2'] + \
+                            x['b3'] * x['t2'] * x['t2'] * x['t2']
+        for i in range(1, len(f1)):
+            ret += f2[i]-f1[i+1]
+        return ret
 
     def calc_spline(self, in_adj_params_flatten):
         """
@@ -151,6 +160,8 @@ class CubicForwardSpline:
             self.calc_prices = calc_prices
             error_calc_df = self.prices.merge(calc_prices, on='ncode')
             ret = np.abs(error_calc_df['price'] - error_calc_df['pv']).sum()
+            print(ret)
+            print('************')
             logger.info("Finished calc_spline")
             return ret
         except Exception as e:
@@ -174,7 +185,7 @@ class CubicForwardSpline:
             logger.exception("Exception occurred in run_one_time")
             raise e
 
-    def run_linear(self):
+    def run_linear(self,in_method='L-BFGS-B'):
         """
         Runs the linear spline optimization.
 
@@ -184,16 +195,23 @@ class CubicForwardSpline:
         logger.info("Starting run_linear")
         try:
             self.run_cubic = False
-            ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, method='L-BFGS-B', options={'ftol': 1e-04, 'maxiter': 1000000})
+            constraint1_args = {'type': 'eq', 'fun': self.constraint1}
+            cons = ([constraint1_args])
+
+            ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, 
+                           method=in_method,
+                           options={'ftol': 1e-05, 'maxiter': 10000000},
+                           constraints=cons)
             logger.info("Finished run_linear")
             self.adj_params = self.params[['b0', 'b1', 'b2', 'b3']].copy()
             self.adj_params_flatten = self.adj_params.values.flatten()
+
             return ret
         except Exception as e:
             logger.exception("Exception occurred in run_linear")
             raise e
 
-    def run_cubic_spline(self):
+    def run_cubic_spline(self,in_method='L-BFGS-B'):
         """
         Runs the cubic spline optimization.
 
@@ -203,7 +221,7 @@ class CubicForwardSpline:
         logger.info("Starting run_cubic_spline")
         try:
             self.run_cubic = True
-            ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, method='L-BFGS-B', options={'ftol': 1e-02, 'maxiter': 10000})
+            ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, method=in_method, options={'ftol': 1e-02, 'maxiter': 10000})
             logger.info("Finished run_cubic_spline")
             return ret
         except Exception as e:
@@ -225,14 +243,15 @@ class CubicForwardSpline:
             self.cf = pd.read_csv(in_cf)
             self.params = pd.read_csv(in_params)
             if self.params is not None:
-                self.params['t1'] = self.params['tenor']
-                self.params['t2'] = self.params['t1'].shift(-1).fillna(99)
-                self.params['b0'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
-                self.params['b1'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
-                self.params['b2'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
-                self.params['b3'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
+                if 't1' not in self.params.columns:
+                    self.params['t1'] = self.params['tenor']
+                    self.params['t2'] = self.params['t1'].shift(-1).fillna(99)
+                #self.params['b0'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
+                #self.params['b1'] = self.generate_long_tail(0, 1, scale=1, size=len(self.params.index))
+                self.params['b2'] = self.generate_long_tail(-0.2, 0.2, scale=1, size=len(self.params.index))
+                self.params['b3'] = self.generate_long_tail(-0.2, 0.2, scale=1, size=len(self.params.index))
             self.adj_params = self.params[['b0', 'b1', 'b2', 'b3']].copy()
-            
+            print(self.params)
             self.adj_params_flatten = self.adj_params.values.flatten()
 
             if self.cf is not None:

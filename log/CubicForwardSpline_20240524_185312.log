@@ -1,0 +1,22 @@
+2024-05-24 18:53:13,840 - INFO - Initializing CubicForwardSpline
+2024-05-24 18:53:13,840 - INFO - Finished initializing CubicForwardSpline
+2024-05-24 18:53:14,955 - INFO - Starting load_data
+2024-05-24 18:53:14,981 - INFO - Finished load_data
+2024-05-24 18:53:18,278 - INFO - Starting run_one_time
+2024-05-24 18:53:18,278 - INFO - Starting calc_spline
+2024-05-24 18:53:18,329 - INFO - Finished calc_spline
+2024-05-24 18:53:18,330 - INFO - Finished run_one_time
+2024-05-24 18:53:19,954 - INFO - Starting run_linear
+2024-05-24 18:53:19,955 - ERROR - Exception occurred in run_linear
+Traceback (most recent call last):
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 201, in run_linear
+    ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten,
+  File "/Users/arbili/opt/anaconda3/envs/whisperx/lib/python3.10/site-packages/scipy/optimize/_minimize.py", line 719, in minimize
+    res = _minimize_slsqp(fun, x0, args, jac, bounds,
+  File "/Users/arbili/opt/anaconda3/envs/whisperx/lib/python3.10/site-packages/scipy/optimize/_slsqp_py.py", line 327, in _minimize_slsqp
+    meq = sum(map(len, [atleast_1d(c['fun'](x, *c['args']))
+  File "/Users/arbili/opt/anaconda3/envs/whisperx/lib/python3.10/site-packages/scipy/optimize/_slsqp_py.py", line 327, in <listcomp>
+    meq = sum(map(len, [atleast_1d(c['fun'](x, *c['args']))
+  File "/Users/arbili/Arik/CubicForwardSpline/notebooks/../model/model.py", line 79, in constraint1
+    f1 = x['b0'] + x['b1'] * x['t1'] + x['b2'] * x['t1'] * x['t1'] + \
+IndexError: only integers, slices (`:`), ellipsis (`...`), numpy.newaxis (`None`) and integer or boolean arrays are valid indices
