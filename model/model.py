@@ -223,6 +223,8 @@ class CubicForwardSpline:
             self.run_cubic = True
             ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, method=in_method, options={'ftol': 1e-02, 'maxiter': 10000})
             logger.info("Finished run_cubic_spline")
+            self.adj_params = self.params[['b0', 'b1', 'b2', 'b3']].copy()
+            self.adj_params_flatten = self.adj_params.values.flatten()
             return ret
         except Exception as e:
             logger.exception("Exception occurred in run_cubic_spline")
