@@ -1,0 +1,7 @@
+cashflow_file_path: "../data/CubiCash_ILS_20231231.csv"
+rates_file_path: "../data/CubiRate_ILS_20231231.csv"
+params_file_path: "../data/Tenet_ILS_20231231.csv"
+runtype: 'linear'
+optimization:
+  - 'Nelder-Mead'
+  - 'L-BFGS-B'

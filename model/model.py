@@ -5,6 +5,7 @@ warnings.filterwarnings("ignore")
 from scipy.optimize import minimize
 import logging
 from datetime import datetime
+import yaml
 
 log_filename = f"/Users/arbili/Arik/CubicForwardSpline/log/CubicForwardSpline_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s', filename=log_filename)
@@ -75,6 +76,11 @@ class CubicForwardSpline:
         data = np.where(data > high, high, data)
         return data
 
+    # Function to read the YAML file and return a dictionary
+    def read_config_file(self):
+        with open('../data/config.yml', 'r') as file:
+            self.config = yaml.safe_load(file)
+    
     def constraint1(self, x):
         f1 = x['b0'] + x['b1'] * x['t1'] + x['b2'] * x['t1'] * x['t1'] + \
                             x['b3'] * x['t1'] * x['t1'] * x['t1']
@@ -83,7 +89,7 @@ class CubicForwardSpline:
         for i in range(1, len(f1)):
             ret += f2[i]-f1[i+1]
         return ret
-
+    
     def calc_spline(self, in_adj_params_flatten):
         """
         Calculates the spline interpolation.
@@ -159,7 +165,10 @@ class CubicForwardSpline:
             calc_prices = cf_new.groupby('ncode')['pv'].sum()
             self.calc_prices = calc_prices
             error_calc_df = self.prices.merge(calc_prices, on='ncode')
-            ret = np.abs(error_calc_df['price'] - error_calc_df['pv']).sum()
+            ret = np.power(error_calc_df['price'] - error_calc_df['pv'],2).sum()
+            ret = ret / 24
+            ret += self.params['wgt_tag'].sum()
+
             print(ret)
             print('************')
             logger.info("Finished calc_spline")
@@ -200,7 +209,7 @@ class CubicForwardSpline:
 
             ret = minimize(fun=self.calc_spline, x0=self.adj_params_flatten, 
                            method=in_method,
-                           options={'ftol': 1e-05, 'maxiter': 10000000},
+                           options={'ftol': 1e-03, 'maxiter': 10000},
                            constraints=cons)
             logger.info("Finished run_linear")
             self.adj_params = self.params[['b0', 'b1', 'b2', 'b3']].copy()
@@ -261,6 +270,27 @@ class CubicForwardSpline:
                 self.cf['tdate'] = pd.to_datetime(self.cf['tdate'], dayfirst=True)
             
             logger.info("Finished load_data")
+        except Exception as e:
+            logger.exception("Exception occurred in load_data")
+            raise e
+    
+        
+    def run(self):
+        try:
+            self.read_config_file()
+            print(self.config)
+            print(self.config['cashflow_file_path'])
+            print(self.config['optimization'])
+            self.load_data(self.config['rates_file_path'],
+                            self.config['cashflow_file_path'],
+                           self.config['params_file_path'])
+            
+            for opt in self.config['optimization']:
+                if (self.config['runtype']=='cubic'):
+                    self.res = self.run_cubic_spline(in_method=opt)
+                else:
+                    self.res = self.run_linear(in_method=opt)
+
         except Exception as e:
             logger.exception("Exception occurred in load_data")
             raise e
