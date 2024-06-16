@@ -275,6 +275,7 @@ class CubicForwardSpline:
             raise e
     
         
+    
     def run(self):
         try:
             self.read_config_file()
